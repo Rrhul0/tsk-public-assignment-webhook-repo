@@ -1,47 +1,79 @@
 # Dev Assessment - Webhook Receiver
 
-Please use this repository for constructing the Flask webhook receiver.
+Use this repository to construct the Flask webhook receiver.
 
-*******************
+---
 
 ## Setup
 
-* Create a new virtual environment
+1. **Create a new virtual environment:**
 
-```bash
-pip install virtualenv
-```
+    ```bash
+    pip install virtualenv
+    ```
 
-* Create the virtual env
+2. **Create the virtual environment:**
 
-```bash
-virtualenv venv
-```
+    ```bash
+    virtualenv venv
+    ```
 
-* Activate the virtual env
+3. **Activate the virtual environment:**
 
-```bash
-source venv/bin/activate
-```
+    ```bash
+    source venv/bin/activate
+    ```
 
-* Install requirements
+4. **Install requirements:**
 
-```bash
-pip install -r requirements.txt
-```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-* Run the flask application (In production, please use Gunicorn)
+5. **Setup MongoDB:**
 
-```bash
-python run.py
-```
+    - **In a Docker container:**
 
-* The endpoint is at:
+        ```bash
+        docker run --name mongodb -d -p 27017:27017 mongo
+        ```
 
-```bash
-POST http://127.0.0.1:5000/webhook/receiver
-```
+    - **Using MongoDB Atlas:**
+        By going to https://www.mongodb.com
 
-You need to use this as the base and setup the flask app. Integrate this with MongoDB (commented at `app/extensions.py`)
+    Create a `.env` file with `MONGO_URI` containing the MongoDB URI.
 
-*******************
+6. **Run the Flask application:**
+
+    ```bash
+    python run.py
+    ```
+
+    > **Note:** In production, use Gunicorn.
+
+7. **Endpoint:**
+
+    ```bash
+    POST http://127.0.0.1:5000/webhook/receiver
+    ```
+
+    To set up the webhook for a GitHub repository, you need a public URL. Use a local tunnel or deploy the app on hosted servers.
+
+    Your public endpoint should be:
+
+    ```bash
+    POST <server_url>/webhook/receiver
+    ```
+
+---
+
+## Screenshots
+
+### Data in MongoDB Docker Container
+![MongoDB Data](/screenshots/mongo_screenshot.png)
+
+### Events API Endpoints JSON
+![Events API JSON](/screenshots/events_api_screenshot.png)
+
+### Working Frontend
+![Frontend](/screenshots/frontend_screenshot.png)
