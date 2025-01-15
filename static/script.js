@@ -1,5 +1,3 @@
-const allEvents = []
-
 async function fetchEvents() {
     try {
         const res = await fetch('/api/events')
@@ -7,13 +5,8 @@ async function fetchEvents() {
             throw new Error('Network response was not ok ' + res.statusText);
 
         const { events } = await res.json()
-        events.forEach(event => {
-            if (!allEvents.some(e => e._id === event._id)) {
-                allEvents.unshift(event);
-            }
-        });
 
-        populateEvents()
+        populateEvents(events)
     }
     catch (error) {
         console.error('Error fetching events:', error);
@@ -21,13 +14,13 @@ async function fetchEvents() {
     }
 }
 
-function populateEvents() {
+function populateEvents(events) {
     const eventsDiv = document.getElementById('events');
 
-    if (allEvents.length > 0) {
+    if (events.length > 0) {
         eventsDiv.innerHTML = ''; // Clear the previous content
 
-        allEvents.forEach(event => {
+        events.forEach(event => {
             const eventDiv = document.createElement('div');
             eventDiv.classList.add('event');
 
