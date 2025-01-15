@@ -2,6 +2,7 @@ from flask import Blueprint, request, abort
 import logging
 from sys import stderr
 from app.extensions import mongo
+import datetime
 
 webhook = Blueprint('Webhook', __name__, url_prefix='/webhook')
 
@@ -57,13 +58,15 @@ def receiver():
         logging.warning(f'{action} action is not supported')
         abort(400)
 
+    print(timestamp)
+
     mongo.db.collection.insert_one({
         'action': action.upper(),
         'request_id':request_id,
         'author': author,
         'from_branch': from_branch,
         'to_branch': to_branch,
-        'timestamp': timestamp
+        'timestamp': datetime.datetime.fromisoformat(timestamp).replace(microsecond=0).strftime('%d %B %Y - %I:%M %p UTC')
     })
 
     return {'status': 'success'}, 200
