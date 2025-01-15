@@ -1,4 +1,4 @@
-from flask import Blueprint, request,abort
+from flask import Blueprint, request, abort
 import logging
 from sys import stderr
 from app.extensions import mongo
