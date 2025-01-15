@@ -8,11 +8,11 @@ async function fetchEvents() {
 
         const { events } = await res.json()
         events.forEach(event => {
-            console.log(event)
             if (!allEvents.some(e => e._id === event._id)) {
-                allEvents.push(event);
+                allEvents.unshift(event);
             }
         });
+
         populateEvents()
     }
     catch (error) {
@@ -33,12 +33,13 @@ function populateEvents() {
 
             // Create formatted message for different event types
             let message = '';
+
             if (event.action === 'PUSH') {
-                message = `${event.action} ${event.author}`;
+                message = `"${event.author}" pushed to "${event.to_branch}" on ${event.timestamp}`;
             } else if (event.action === 'PULL_REQUEST') {
-                message = `${event.action} ${event.author}`;
+                message = `"${event.author}" submitted a pull request from "${event.from_branch}" to "${event.to_branch}" on ${event.timestamp}`;
             } else if (event.action === 'MERGE') {
-                message = `${event.action} ${event.author}`;
+                message = `${event.author} merged branch "${event.from_branch}" to "${event.to_branch}" on ${event.timestamp}`;
             }
 
             eventDiv.textContent = message;

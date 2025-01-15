@@ -31,7 +31,10 @@ def receiver():
         author = head_commit['author']['username']
         to_branch = payload['ref'].split('/')[-1]
         request_id = head_commit['id']
-        timestamp = head_commit['timestamp']
+        timestamp = datetime.datetime.fromisoformat(head_commit['timestamp'])
+        # dt = datetime.datetime.strptime(timestampTZ, '%Y-%m-%dT%H:%M:%SZ')
+        # utc_time = dt.astimezone(datetime.timezone.utc)
+        # timestamp = utc_time.isoformat()
     
     elif action == "pull_request": 
         pull_request = payload['pull_request']
@@ -42,13 +45,13 @@ def receiver():
         if payload['action']=='opened':
             # opened a new PR (means this will not run when any commit pushed to PR branch)
             author = pull_request['user']['login']
-            timestamp = pull_request['created_at']
+            timestamp = datetime.datetime.strptime(pull_request['created_at'],"%Y-%m-%dT%H:%M:%SZ")
         
         elif payload['action'] == 'closed' and payload['pull_request']['merged']:
             # this is a merge action
             action = 'merge'
             author = pull_request['merged_by']['login']
-            timestamp = pull_request['merged_at']
+            timestamp = datetime.datetime.strptime(pull_request['merged_at'],"%Y-%m-%dT%H:%M:%SZ")
 
         else:
             logging.warning(payload['action']+' pull request action is not supported')
@@ -66,7 +69,7 @@ def receiver():
         'author': author,
         'from_branch': from_branch,
         'to_branch': to_branch,
-        'timestamp': datetime.datetime.fromisoformat(timestamp).replace(microsecond=0).strftime('%d %B %Y - %I:%M %p UTC')
+        'timestamp': timestamp.replace(microsecond=0).strftime('%d %B %Y - %I:%M %p UTC')
     })
 
     return {'status': 'success'}, 200
