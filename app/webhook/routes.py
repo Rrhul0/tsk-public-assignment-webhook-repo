@@ -23,18 +23,22 @@ def receiver():
     timestamp=''
 
     if action == 'push':
-        # means that a new branch is created
+        print(payload)
         if payload['before']=='0000000000000000000000000000000000000000':
+            # means that a new branch is created
+            # we are not interested in these commits
+            return {'status': 'success'}, 200
+        elif payload['head_commit']['committer']['username']=='web-flow':
+            # means that the commit is from merge commit or github actions
+            # we are not interested in these commits
             return {'status': 'success'}, 200
             
         head_commit = payload['head_commit']
         author = head_commit['author']['username']
         to_branch = payload['ref'].split('/')[-1]
         request_id = head_commit['id']
-        timestamp = datetime.datetime.fromisoformat(head_commit['timestamp'])
-        # dt = datetime.datetime.strptime(timestampTZ, '%Y-%m-%dT%H:%M:%SZ')
-        # utc_time = dt.astimezone(datetime.timezone.utc)
-        # timestamp = utc_time.isoformat()
+        # head_commit['timestamp'] is in format 2021-08-17T14:00:00+05:30
+        timestamp = datetime.datetime.fromisoformat(head_commit['timestamp']).astimezone(datetime.timezone.utc)
     
     elif action == "pull_request": 
         pull_request = payload['pull_request']
@@ -45,12 +49,14 @@ def receiver():
         if payload['action']=='opened':
             # opened a new PR (means this will not run when any commit pushed to PR branch)
             author = pull_request['user']['login']
+            # pull_request['created_at'] is in format 2021-08-17T14:00:00Z
             timestamp = datetime.datetime.strptime(pull_request['created_at'],"%Y-%m-%dT%H:%M:%SZ")
         
         elif payload['action'] == 'closed' and payload['pull_request']['merged']:
             # this is a merge action
             action = 'merge'
             author = pull_request['merged_by']['login']
+            # pull_request['created_at'] is in format 2021-08-17T14:00:00Z
             timestamp = datetime.datetime.strptime(pull_request['merged_at'],"%Y-%m-%dT%H:%M:%SZ")
 
         else:
